@@ -1,13 +1,13 @@
 //- Alunos: 1.Khalil Carsten do Nascimento - 15/0134495
 //          2.João Gabriel - 15/0131992
 
-#include<iostream>
-#include<fstream>
-#include<string>
-#include<vector>
-#include<cstdlib>
-#include<sstream>
-#include<bits/stdc++.h>
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
+#include <cstdlib>
+#include <sstream>
+#include <bits/stdc++.h>
 
 using namespace std;
 
@@ -60,7 +60,7 @@ void Graph::add_weight(int node, int weight){
 // Tambem garante que nao existe vertices repetidos na lista
 // de vizinhos e os mantem ordenados.
 void Graph::add_edge(int f_node, int s_node){
-        adj[f_node].second.push_back(s_node);
+    adj[f_node].second.push_back(s_node);
 }
 
 // Funcao de Debug que escreve o grafo no terminal
@@ -71,13 +71,34 @@ void Graph::print_graph(){
             cout << "  |-->" << adj[i].second[j] << "--" << endl;
         }
     }
+    cout << adj[2].second[0]<<endl;
 }
 
 // Funcao responsavel por exibir e controlar o menu
 // Recebe como parâmetro g(ponteiro do Grafo em que serão realizadas as operações do menu)
 int menu(Graph &g){
     int a;
-    while(a != 3){
+    cout << "escolha uma opcao:"<<endl;
+    cout << "1-->       mostrar o grafo"<<endl;
+    cout << "2-->       mostrar o caminho critico"<<endl;
+    cout << "3-->       mostrar a ordenacao topologica"<<endl;
+    cout << "sair(qualquer outra tecla)"<<endl;
+    cin >> a;
+    switch (a){
+    	case(1):
+    		system("clear");
+    		g.print_graph();
+    		break;
+    	case(2):
+    		system("clear");
+    		//g.caminho_crit();
+    		break;
+    	case(3):
+    		system("clear");
+    		//g.ordena_top();
+    		break;
+    	default:
+    		exit(1);				
     }
 }
 
@@ -87,35 +108,48 @@ int menu(Graph &g){
 // indice(inteiro usado para se manejar o grafo)
 void process_line(string &line, Graph &g){
     string aux(6, 0);
-    string aux2;
+    string aux2(6,0);
     int i, j = 0, ct = 0, cr, f;
     int node;
+    int find = 0;
 
     for(i = 0; line[i] != '\0'; i++){
         if(line[i] == '#'){
+            find = 1;
             ct++;
-            aux[j] = '\0';
+            aux[j+1] = '\0';
             j = 0;
-            i++;
         }
-        if(ct == 1){
-            node = m[aux];
-        } else if(ct == 2){
-            cr = aux[0] - '0';
-        } else if(ct == 3){
-            f = aux[0] - '0';
-        } else if(ct > 3){
-            g.add_edge(node, m[aux]);
-        }
-        aux[j] = line[i];
-        j++;
+        if(find == 1){
+        	if(ct == 1){
+            	node = m[aux];
+	        } else if(ct == 2){
+	            cr = aux[0] - '0';
+	        } else if(ct == 3){
+	            f = aux[0] - '0';
+	        } else{
+	        	aux2[0] = aux[0];
+	        	aux2[1] = aux[1];
+	        	aux2[2] = aux[2];
+	        	aux2[3] = aux[3];
+	        	aux2[4] = aux[4];
+	        	aux2[5] = aux[5];
+	        	aux2[6] = aux2[6];
+	        	g.add_edge(node, m[aux2]);
+	        }
+	        find = 0;
+	        aux.clear();
+	    }
+	    if(line[i] != '#') {  
+        	aux[j] = line[i];
+        	j++;
+    	}
     }
-    cout << line << endl;
     g.add_weight(node, cr*f);
 }
 
 void process_names(string &line, int indice){
-    string aux(7, 0);
+    string aux(6, 0);
     int i;
     for(i = 0; line[i] != '#'; i++){
         aux[i] = line[i];
@@ -140,7 +174,6 @@ int main(){
 
     indice = 0;
     fl1.close();
-
     getchar();
     fl2.open("materias_do_curso.txt", fstream::in);
 
@@ -150,12 +183,13 @@ int main(){
     }
     fl2.close();
 
+
     // for(int a = 0;){
     //     cout << a.first << " ---- " << a.second << endl;
     // }
 
-    g.print_graph();
-    // menu(g);
+    
+    menu(g);
 
     return 0;
 }
