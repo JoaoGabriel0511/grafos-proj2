@@ -17,6 +17,8 @@ using namespace std;
 fstream js_fl;
 // map  que ira mapear a matricula de cada vertice com o seu indice
 map<string, int> m;
+vector<int> L;
+vector<bool> visitado(35, 0);
 
 // Classe que define a estrutura do Grafo
 class Graph{
@@ -42,6 +44,9 @@ Graph::Graph(int size){
     }
 }
 
+int Graph::size(){
+    return adj.size();
+}
 // Funcao que define o operador "[]" para a classe grafo
 // assim eh possivel acessar uma lista de adjacencia usando somente g[lista]
 // Recebe como parametro o inteiro index que o indice da lista do vertice requisitado
@@ -74,15 +79,47 @@ void Graph::print_graph(){
     cout << adj[2].second[0]<<endl;
 }
 
+vector<int> return_S(Graph g){
+    set<int> s;
+    vector<int> v;
+
+    for(int i = 0; i < g.size(); i++){
+        for(int j = 0; j < g[i].second.size(); j++){
+            s.insert(g[i].second[j]);
+        }
+    }
+
+    for(int i = 0; i < g.size(); i++){
+        if(s.find(i) == s.end()){
+            v.push_back(i);
+        }
+    }
+
+    return v;
+}
+
+void visita(int node, Graph g){
+
+    if(visitado[node] == 0){
+        visitado[node] = 1;
+        for(int i = 0; i < g[node].second.size(); i++){
+            visita(g[node].second[i], g);
+        }
+        L.push_back(node);
+    }
+}
+
 // Funcao responsavel por exibir e controlar o menu
 // Recebe como parâmetro g(ponteiro do Grafo em que serão realizadas as operações do menu)
 int menu(Graph &g){
     int a;
-    cout << "escolha uma opcao:"<<endl;
-    cout << "1-->       mostrar o grafo"<<endl;
-    cout << "2-->       mostrar o caminho critico"<<endl;
-    cout << "3-->       mostrar a ordenacao topologica"<<endl;
-    cout << "sair(qualquer outra tecla)"<<endl;
+    vector<int> S;
+
+    cout << "escolha uma opcao:"<< endl;
+    cout << "1-->       mostrar o grafo"<< endl;
+    cout << "2-->       mostrar o caminho critico"<< endl;
+    cout << "3-->       mostrar a ordenacao topologica"<< endl;
+    cout << "sair(qualquer outra tecla)"<< endl;
     cin >> a;
     switch (a){
     	case(1):
@@ -95,10 +132,20 @@ int menu(Graph &g){
     		break;
     	case(3):
     		system("clear");
-    		//g.ordena_top();
+
+            S = return_S(g);
+
+            for(auto v : S){
+                visita(v, g);
+            }
+            cout << endl;
+            for(auto v : L){
+                cout << "[" << v << "] ";
+            }
+
     		break;
     	default:
-    		exit(1);				
+    		exit(1);
     }
 }
 
@@ -140,7 +187,7 @@ void process_line(string &line, Graph &g){
 	        find = 0;
 	        aux.clear();
 	    }
-	    if(line[i] != '#') {  
+	    if(line[i] != '#') {
         	aux[j] = line[i];
         	j++;
     	}
@@ -165,7 +212,7 @@ int main(){
     string line;
     ifstream fl1, fl2;
 
-    fl1.open("materias_do_curso.txt", fstream::in);
+    fl1.open("materias_do_curso2.txt", fstream::in);
 
     for(string line; getline(fl1, line);){
         process_names(line, indice);
@@ -175,7 +222,7 @@ int main(){
     indice = 0;
     fl1.close();
     getchar();
-    fl2.open("materias_do_curso.txt", fstream::in);
+    fl2.open("materias_do_curso2.txt", fstream::in);
 
     for(string line; getline(fl2, line);){
         process_line(line, g);
@@ -183,12 +230,6 @@ int main(){
     }
     fl2.close();
 
-
-    // for(int a = 0;){
-    //     cout << a.first << " ---- " << a.second << endl;
-    // }
-
-    
     menu(g);
 
     return 0;
