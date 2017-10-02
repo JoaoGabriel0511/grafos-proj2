@@ -34,6 +34,8 @@ class Graph{
         void add_weight(int node, int weight);
         void print_graph();
         iv& operator[](int  index);
+        int* caminho_crit(vector<int> L);
+        void acha_crit(int * aux, int pos);
 };
 
 // Contrutor do grafo, -int size- relativo ao numero de alunos n grafo
@@ -78,6 +80,39 @@ void Graph::print_graph(){
     }
     cout << adj[2].second[0]<<endl;
 }
+int *Graph::caminho_crit(vector<int> L){
+	int *aux = (int*)malloc(35 * sizeof(int));
+	for(int i = 0; i< 35;i++){
+		aux[i] = 0;
+	}
+	int i = 0;
+	for(auto v : L){
+		for(int j = 0; j < adj[v].second.size();j++){
+			if(adj[v].first > aux[adj[v].second[j]]){
+				aux[adj[v].second[j]] = adj[v].first;
+			}
+		}
+	}
+	return aux;
+}
+void Graph::acha_crit(int * aux, int pos){
+	for(int i = 0; i < 35;i++){
+		for(int j = 0; j < adj[i].second.size(); ++j){
+			//cout << "Ah"<<endl;
+			if(adj[i].second[j] == pos){
+				cout <<"["<< pos <<"]"<< "<---"<<aux[pos]<<"---- ";
+				acha_crit(aux, i);
+			}
+		}
+	}
+	return;
+}
+int * Graph::acha_criti(int * aux, int pos, int * max, int  soma){
+	for(int j = 0; j < adj[pos].second.size(); j++){
+		soma = soma + adj[pos].first;
+
+	}
+}
 
 vector<int> return_S(Graph g){
     set<int> s;
@@ -113,8 +148,12 @@ void visita(int node, Graph g){
 // Recebe como parâmetro g(ponteiro do Grafo em que serão realizadas as operações do menu)
 int menu(Graph &g){
     int a;
+    int* aux;
     vector<int> S;
-
+    vector<int[2]> G;
+    int max = 0;
+    int pos;
+    vector<int[2]> cam_c;
     cout << "escolha uma opcao:"<< endl;
     cout << "1-->       mostrar o grafo"<< endl;
     cout << "2-->       mostrar o caminho critico"<< endl;
@@ -128,7 +167,19 @@ int menu(Graph &g){
     		break;
     	case(2):
     		system("clear");
-    		//g.caminho_crit();
+    		S = return_S(g);
+
+            for(auto v : S){
+                visita(v, g);
+            }
+            aux = g.caminho_crit(L);
+	        for(int i = 0; i < 35; i++){
+	            if(aux[i] >= max){
+	            	max = aux[i];
+	            	pos = i;
+	            }
+	        }
+	        g.acha_crit(aux, pos);   
     		break;
     	case(3):
     		system("clear");
