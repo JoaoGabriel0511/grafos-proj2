@@ -36,6 +36,7 @@ class Graph{
         iv& operator[](int  index);
         int* caminho_crit(vector<int> L);
         void acha_crit(int * aux, int pos);
+        int * acha_criti(int * aux, int pos, int * max, int  soma);
 };
 
 // Contrutor do grafo, -int size- relativo ao numero de alunos n grafo
@@ -70,13 +71,23 @@ void Graph::add_edge(int f_node, int s_node){
     adj[f_node].second.push_back(s_node);
 }
 
+string find_value(int value){
+    for(auto f : m){
+        if(f.second == value){
+            return f.first;
+        }
+    }
+}
+
 // Funcao de Debug que escreve o grafo no terminal
 void Graph::print_graph(){
     for(int i = 0; i < adj.size(); i++){
-        cout << i << "{" << adj[i].first << "}" << endl;
+        cout << find_value(i) << " " << "Peso: " << adj[i].first << endl;
+        cout << "eh pre-requisito para : " << endl;
         for(int j = 0; j < adj[i].second.size(); j++){
-            cout << "  |-->" << adj[i].second[j] << "--" << endl;
+            cout << "          |-->" << find_value(adj[i].second[j]) << endl;
         }
+        cout << endl;
     }
     cout << adj[2].second[0]<<endl;
 }
@@ -98,9 +109,8 @@ int *Graph::caminho_crit(vector<int> L){
 void Graph::acha_crit(int * aux, int pos){
 	for(int i = 0; i < 35;i++){
 		for(int j = 0; j < adj[i].second.size(); ++j){
-			//cout << "Ah"<<endl;
 			if(adj[i].second[j] == pos){
-				cout <<"["<< pos <<"]"<< "<---"<<aux[pos]<<"---- ";
+				cout <<"["<< find_value(pos) <<"]"<< "<---"<< aux[pos] <<"---- ";
 				acha_crit(aux, i);
 			}
 		}
@@ -114,6 +124,7 @@ int * Graph::acha_criti(int * aux, int pos, int * max, int  soma){
 	}
 }
 
+// Essa funcao retorna uma lista com todas as materias q n possuem pre-requisitos
 vector<int> return_S(Graph g){
     set<int> s;
     vector<int> v;
@@ -133,6 +144,7 @@ vector<int> return_S(Graph g){
     return v;
 }
 
+// Essa funcao promove o dfs no grado gerando na lista L a ordenação topologica
 void visita(int node, Graph g){
 
     if(visitado[node] == 0){
@@ -154,56 +166,63 @@ int menu(Graph &g){
     int max = 0;
     int pos;
     vector<int[2]> cam_c;
-    cout << "escolha uma opcao:"<< endl;
-    cout << "1-->       mostrar o grafo"<< endl;
-    cout << "2-->       mostrar o caminho critico"<< endl;
-    cout << "3-->       mostrar a ordenacao topologica"<< endl;
-    cout << "sair(qualquer outra tecla)"<< endl;
-    cin >> a;
-    switch (a){
-    	case(1):
-    		system("clear");
-    		g.print_graph();
-    		break;
-    	case(2):
-    		system("clear");
-    		S = return_S(g);
+    while(a != 4){
+        cout << "escolha uma opcao:"<< endl;
+        cout << "1-->       mostrar o grafo"<< endl;
+        cout << "2-->       mostrar o caminho critico"<< endl;
+        cout << "3-->       mostrar a ordenacao topologica"<< endl;
+        cout << "sair(qualquer outra tecla)"<< endl;
+        cin >> a;
+        system("clear");
+        switch (a){
+        	case(1):
+        		g.print_graph();
+                getchar();
+                getchar();
+        		break;
+        	case(2):
+        		S = return_S(g);
 
-            for(auto v : S){
-                visita(v, g);
-            }
-            aux = g.caminho_crit(L);
-	        for(int i = 0; i < 35; i++){
-	            if(aux[i] >= max){
-	            	max = aux[i];
-	            	pos = i;
-	            }
-	        }
-	        g.acha_crit(aux, pos);   
-    		break;
-    	case(3):
-    		system("clear");
+                for(auto v : S){
+                    visita(v, g);
+                }
+                aux = g.caminho_crit(L);
+    	        for(int i = 0; i < 35; i++){
+    	            if(aux[i] >= max){
+    	            	max = aux[i];
+    	            	pos = i;
+    	            }
+    	        }
+    	        g.acha_crit(aux, pos);
+                getchar();
+                getchar();
+        		break;
+        	case(3):
 
-            S = return_S(g);
+                S = return_S(g);
 
-            for(auto v : S){
-                visita(v, g);
-            }
-            cout << endl;
-            for(auto v : L){
-                cout << "[" << v << "] ";
-            }
+                for(auto v : S){
+                    visita(v, g);
+                }
+                cout << endl;
+                for(auto v : L){
+                    cout << "[" << find_value(v) << "]-->";
+                }
+                cout << "end" << endl;
 
-    		break;
-    	default:
-    		exit(1);
+                getchar();
+                getchar();
+        		break;
+        	default:
+        		exit(1);
+        }
     }
 }
 
 // Funcao responsavel por processar cada linha do arquivo de entrada
-// amigos_tag20172 e criar o grafo a partir dele
-// recebe como parâmetrosa line(ponteiro de string, é a linha do arquivo lida), g(ponteiro de Grafo, o grafo a ser formado) e
-// indice(inteiro usado para se manejar o grafo)
+// materias_do_curso e criar o grafo a partir dele
+// recebe como parâmetrosa line(ponteiro de string, é a linha do arquivo lida),
+// g(ponteiro de Grafo, o grafo a ser formado) e
 void process_line(string &line, Graph &g){
     string aux(6, 0);
     string aux2(6,0);
@@ -246,6 +265,8 @@ void process_line(string &line, Graph &g){
     g.add_weight(node, cr*f);
 }
 
+// Essa funcao processa as materias e cria indices para elas facilitando a
+// manipulacao nas estruturas de dados
 void process_names(string &line, int indice){
     string aux(6, 0);
     int i;
@@ -272,7 +293,6 @@ int main(){
 
     indice = 0;
     fl1.close();
-    getchar();
     fl2.open("materias_do_curso2.txt", fstream::in);
 
     for(string line; getline(fl2, line);){

@@ -1,0 +1,13 @@
+---SegundoTrabalho relativo a matéria Teoria e aplicação de grafos---
+
+- Alunos: 1.Khalil Carsten do Nascimento - 15/0134495
+          2.João Gabriel - 15/0131992
+
+- Compilador: g++ versão 6.3.0
+
+- Flag de compilação: -ansi -std=c++11 (g++ -ansi -std=c++11 main.cpp)
+
+
+Código principal do trabalho se encontra no arquivo "main.cpp".
+
+Ao executar o programa o menu é auto explicativo.
